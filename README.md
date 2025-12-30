@@ -139,5 +139,5 @@ print("Safe:", sm.saft_softmax(data))
 
 # 4. Run Online Top-K
 probs, indices = sm.online_with_top_K(data, k=2)
-print(f"Top 2 Probs: {probs}") -->
-    return top_probs, top_indices
+rint(f"Top 2 Probs: {probs}") -->
+return top_probs, top_indices
