@@ -1,27 +1,33 @@
-<!-- <p align="center">
-  <img src="image/Screenshot 2025-12-31 004953.png" width="600">
-  </p>
 <p align="center">
-  <img src="https://img.shields.io/badge/Softmax-Algorithms-blue?style=for-the-badge&logo=python" alt="Project Logo">
+  <img src="image/Screenshot 2025-12-31 004953.png" width="600">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Softmax-Algorithms-blue?style=for-the-badge&logo=python">
 </p>
 
 # Softmax Algorithms
 
-This repository contains Python implementations of various Softmax algorithms, ranging from the naive approach to numerically stable and online versions.
+This repository contains Python implementations of multiple **Softmax algorithms**, starting from the naive formulation to **numerically stable** and **online (streaming)** variants.
 
 <p align="center">
   <a href="https://arxiv.org/pdf/1805.02867">
-    <img src="https://img.shields.io/badge/arXiv-1805.02867-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white" alt="Research Paper">
+    <img src="https://img.shields.io/badge/arXiv-1805.02867-B31B1B?style=for-the-badge&logo=arxiv">
   </a>
   <br>
-  <i>Based on "Online Normalizer Calculation for Softmax"</i>
+  <i>Based on “Online Normalizer Calculation for Softmax”</i>
 </p>
 
 ---
 
 ## 📌 Overview
 
-The project implements a `softmax` class with methods to handle standard calculations, numerical stability, and streaming data.
+The project implements a `softmax` class that demonstrates:
+
+- Why naive softmax fails numerically
+- How max-shifting stabilizes exponentials
+- How normalization can be done **online**
+- How **Top-K probabilities** can be extracted efficiently from streams
 
 <p align="center">
   <img src="image/Screenshot 2025-12-31 001234.png" width="600">
@@ -29,115 +35,77 @@ The project implements a `softmax` class with methods to handle standard calcula
   <img src="image/Screenshot 2025-12-31 001249.png" width="600">
   <img src="image/Screenshot 2025-12-31 001309.png" width="600">
   <br>
-  <em>Figure 1: Visual representation of the Safe Softmax shifting logic.</em>
+  <em>Figure: Safe Softmax using max-shift for numerical stability</em>
 </p>
 
-Key Features:
-* **Standard Softmax** (Naive implementation)
-* **Numerical Stability** (Handling overflow/underflow)
-* **Dynamic Normalization**
-* **Online / Streaming Data** (Top-K elements)
+---
 
-> **⚠️ Important Note on Precision:**
-> The code in this repository is experimental and currently uses an approximate value for Euler's number (`e = 2.718`) for demonstration purposes.
-> For production environments, it is **strongly recommended** to use `numpy.exp()` or `math.exp()`.
+## ✨ Implemented Algorithms
 
-## 💻 Implementation
+- **Naive Softmax**
+- **Safe Softmax (Max-Shift)**
+- **Safe Softmax with Online Normalizer**
+- **Online Softmax with Top-K Extraction**
 
-Below is the core code provided in `Softmax_Algorithms.ipynb`.
+> ⚠️ **Precision Note**
+>
+> This repository uses an approximate value of Euler’s number  
+> `e = 2.718` **only for educational clarity**.
+>
+> 🚨 **For real systems**, always use:
+> ```python
+> math.exp(x)  # or numpy.exp(x)
+> ```
+
+---
+
+## 💻 Core Implementation
 
 ```python
-```python
-class softmax:
-    def softmax_navie(self, arr: list[float]) -> list[float]:
-        self.n = len(arr)
-        self.exp_vlaues = 0
-        
-        # Naive implementation
-        for i in range(self.n):
-            exp = 2.718 ** arr[i]
-            self.exp_vlaues += exp
-            
-        return [(2.718 ** arr[j] / self.exp_vlaues) for j in range(self.n)]
-    
-    def saft_softmax(self, arr: list[float]) -> list[float]:
-        self.n = len(arr)
-        self.max = max(arr)
-        self.denameter = 0
-        
-        for i in range(self.n):
-            # Subtracting max for stability
-            self.denameter += 2.718 ** (arr[i] - self.max)   
-        return [(2.718 ** (arr[j] - self.max) / self.denameter) for j in range(self.n)]
-    
-    def safe_softmax_with_norm(self, arr: list[float]) -> list[float]:
-        self.n = len(arr)
-        self.denameter = 0
-        
+class Softmax:
+    def naive_softmax(self, arr):
+        exp_sum = 0.0
+        for x in arr:
+            exp_sum += 2.718 ** x
+        return [(2.718 ** x) / exp_sum for x in arr]
+
+    def safe_softmax(self, arr):
+        m = max(arr)
+        denom = 0.0
+        for x in arr:
+            denom += 2.718 ** (x - m)
+        return [(2.718 ** (x - m)) / denom for x in arr]
+
+    def online_softmax(self, arr):
         m = float("-inf")
-        d = 0
-        for i in range(self.n):
-            m_prov = m 
-            m = max(m_prov, arr[i])
-            correction = 2.718 ** (m_prov - m)
-            new_term = 2.718 ** (arr[i] - m)
-            d = (d * correction) + new_term 
-        return [(2.718**(arr[j] - m) / d) for j in range(self.n)]
-    
-    def online_with_top_K(self, arr: list[float], k: int):
-        # Implementation based on the referenced arXiv paper
-        self.n = len(arr)
-        m = float("-inf")
-        d = 0.0 
-        u = [float("-inf")] * (k + 1)
-        p = [-1] * (k + 1)
-        
-        for i in range(self.n):
-            x_val = arr[i]
+        d = 0.0
+        for x in arr:
             m_prev = m
-            m = max(m_prev, x_val)
-            correction = 2.718**(m_prev - m)
-            d = (d * correction) + (x_val - m)
-            
-            u[k] = x_val   
-            p[k] = i       
-            
-            ptr = k 
-            while ptr >= 1 and u[ptr] > u[ptr-1]:
-                u[ptr], u[ptr-1] = u[ptr-1], u[ptr]
-                p[ptr], p[ptr-1] = p[ptr-1], p[ptr]
-                ptr -= 1
-                
-        top_probs = []
-        top_indices = []
-        for i in range(k):
-            val = 2.718**(u[i] - m) / d
-            top_probs.append(val)
-            top_indices.append(p[i])
-        return top_probs, top_indices
-📊 Performance Benchmarks
-We compared the execution time of the different algorithms as the input size increases.
+            m = max(m, x)
+            d = d * (2.718 ** (m_prev - m)) + (2.718 ** (x - m))
+        return [(2.718 ** (x - m)) / d for x in arr]
 
-Naive Softmax: Fast for small inputs but prone to overflow.
+    def online_top_k(self, arr, k):
+        m = float("-inf")
+        d = 0.0
 
-Safe Softmax: Slightly slower due to the overhead of finding max() and adjusting exponents, but ensures numerical stability.
+        top_vals = [float("-inf")] * k
+        top_idx = [-1] * k
 
-Online Softmax: Efficient for retrieving only the top-K results from a stream without storing all elements.
+        for i, x in enumerate(arr):
+            m_prev = m
+            m = max(m, x)
+            d = d * (2.718 ** (m_prev - m)) + (2.718 ** (x - m))
 
-🚀 Usage
-Python
+            if x > top_vals[-1]:
+                top_vals[-1] = x
+                top_idx[-1] = i
+                j = k - 1
+                while j > 0 and top_vals[j] > top_vals[j - 1]:
+                    top_vals[j], top_vals[j - 1] = top_vals[j - 1], top_vals[j]
+                    top_idx[j], top_idx[j - 1] = top_idx[j - 1], top_idx[j]
+                    j -= 1
 
-# 1. Initialize the class
-sm = softmax()
-data = [1.0, 5.0, 10.0, 20.0]
+        probs = [(2.718 ** (x - m)) / d for x in top_vals]
+        return probs, top_idx
 
-# 2. Run Naive Softmax
-print("Naive:", sm.softmax_navie(data))
-
-# 3. Run Safe Softmax (Recommended)
-print("Safe:", sm.saft_softmax(data))
-
-# 4. Run Online Top-K
-probs, indices = sm.online_with_top_K(data, k=2)
-rint(f"Top 2 Probs: {probs}") -->
-return top_probs, top_indices
