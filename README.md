@@ -10,6 +10,11 @@ The project implements a `softmax` class with methods to handle:
 * **Dynamic Normalization**
 * **Online / Streaming Data** (Top-K elements)
 
+> **⚠️ Important Note on Precision:**
+> The code in this repository is experimental and currently uses an approximate value for Euler's number (`e = 2.718`) for demonstration purposes.
+>
+> For production environments or scientific calculations, it is **strongly recommended** to use `numpy.exp()` or `math.exp()` to ensure higher precision and performance.
+
 ## 💻 Implementation
 
 Below is the core code provided in `Softmax_Algorithms.ipynb`.
@@ -20,8 +25,8 @@ class softmax:
         self.n = len(arr)
         self.exp_vlaues = 0
         
+        # Note: Uses approx e=2.718. Use numpy.exp() for production.
         for i in range(self.n):
-            # Calculating exponential
             exp = 2.718 ** arr[i]
             self.exp_vlaues += exp
             
@@ -90,4 +95,3 @@ class softmax:
             top_indices.append(p[i])
 
         return top_probs, top_indices
-        
