@@ -23,8 +23,7 @@ This repository contains Python implementations of various Softmax algorithms, r
 The project implements a `softmax` class with methods to handle standard calculations, numerical stability, and streaming data.
 
 <p align="center">
-  <img src="Screenshot 2025-12-31 001234.png
-" alt="Softmax Algorithm Logic Diagram" width="600">
+  <img src="image/Screenshot 2025-12-31 001234.png" width="600">
   <br>
   <em>Figure 1: Visual representation of the Safe Softmax shifting logic.</em>
 </p>
