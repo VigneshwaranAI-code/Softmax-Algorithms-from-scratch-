@@ -24,7 +24,7 @@ The project implements a `softmax` class with methods to handle standard calcula
 
 <p align="center">
   <img src="image/Screenshot 2025-12-31 001234.png" width="600">
-  <img src="image/Screenshot 2025-12-31 001234.png" width="600">
+  <img src="image/Screenshot 2025-12-31 001242.png" width="600">
   <img src="image/Screenshot 2025-12-31 001234.png" width="600">
   <img src="image/Screenshot 2025-12-31 001234.png" width="600">
   <br>
