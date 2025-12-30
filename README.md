@@ -46,6 +46,7 @@ Key Features:
 Below is the core code provided in `Softmax_Algorithms.ipynb`.
 
 ```python
+```python
 class softmax:
     def softmax_navie(self, arr: list[float]) -> list[float]:
         self.n = len(arr)
@@ -56,4 +57,85 @@ class softmax:
             exp = 2.718 ** arr[i]
             self.exp_vlaues += exp
             
-        return [(2.718 ** arr[j] / self.exp_vlau
+        return [(2.718 ** arr[j] / self.exp_vlaues) for j in range(self.n)]
+    
+    def saft_softmax(self, arr: list[float]) -> list[float]:
+        self.n = len(arr)
+        self.max = max(arr)
+        self.denameter = 0
+        
+        for i in range(self.n):
+            # Subtracting max for stability
+            self.denameter += 2.718 ** (arr[i] - self.max)   
+        return [(2.718 ** (arr[j] - self.max) / self.denameter) for j in range(self.n)]
+    
+    def safe_softmax_with_norm(self, arr: list[float]) -> list[float]:
+        self.n = len(arr)
+        self.denameter = 0
+        
+        m = float("-inf")
+        d = 0
+        for i in range(self.n):
+            m_prov = m 
+            m = max(m_prov, arr[i])
+            correction = 2.718 ** (m_prov - m)
+            new_term = 2.718 ** (arr[i] - m)
+            d = (d * correction) + new_term 
+        return [(2.718**(arr[j] - m) / d) for j in range(self.n)]
+    
+    def online_with_top_K(self, arr: list[float], k: int):
+        # Implementation based on the referenced arXiv paper
+        self.n = len(arr)
+        m = float("-inf")
+        d = 0.0 
+        u = [float("-inf")] * (k + 1)
+        p = [-1] * (k + 1)
+        
+        for i in range(self.n):
+            x_val = arr[i]
+            m_prev = m
+            m = max(m_prev, x_val)
+            correction = 2.718**(m_prev - m)
+            d = (d * correction) + (x_val - m)
+            
+            u[k] = x_val   
+            p[k] = i       
+            
+            ptr = k 
+            while ptr >= 1 and u[ptr] > u[ptr-1]:
+                u[ptr], u[ptr-1] = u[ptr-1], u[ptr]
+                p[ptr], p[ptr-1] = p[ptr-1], p[ptr]
+                ptr -= 1
+                
+        top_probs = []
+        top_indices = []
+        for i in range(k):
+            val = 2.718**(u[i] - m) / d
+            top_probs.append(val)
+            top_indices.append(p[i])
+        return top_probs, top_indices
+📊 Performance Benchmarks
+We compared the execution time of the different algorithms as the input size increases.
+
+Naive Softmax: Fast for small inputs but prone to overflow.
+
+Safe Softmax: Slightly slower due to the overhead of finding max() and adjusting exponents, but ensures numerical stability.
+
+Online Softmax: Efficient for retrieving only the top-K results from a stream without storing all elements.
+
+🚀 Usage
+Python
+
+# 1. Initialize the class
+sm = softmax()
+data = [1.0, 5.0, 10.0, 20.0]
+
+# 2. Run Naive Softmax
+print("Naive:", sm.softmax_navie(data))
+
+# 3. Run Safe Softmax (Recommended)
+print("Safe:", sm.saft_softmax(data))
+
+# 4. Run Online Top-K
+probs, indices = sm.online_with_top_K(data, k=2)
+print(f"Top 2 Probs: {probs}")
