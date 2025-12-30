@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="image/Screenshot 2025-12-31 001234.png" width="600">
+  <img src="image/Screenshot 2025-12-31 004953.png width="600">
   </p>
 <p align="center">
   <img src="https://img.shields.io/badge/Softmax-Algorithms-blue?style=for-the-badge&logo=python" alt="Project Logo">
