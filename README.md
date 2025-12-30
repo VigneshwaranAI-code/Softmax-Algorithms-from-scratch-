@@ -26,7 +26,7 @@ The project implements a `softmax` class with methods to handle standard calcula
   <img src="image/Screenshot 2025-12-31 001234.png" width="600">
   <img src="image/Screenshot 2025-12-31 001242.png" width="600">
   <img src="image/Screenshot 2025-12-31 001249.png" width="600">
-  <img src="image/Screenshot 2025-12-31 001234.png" width="600">
+  <img src="image/Screenshot 2025-12-31 001309.png" width="600">
   <br>
   <em>Figure 1: Visual representation of the Safe Softmax shifting logic.</em>
 </p>
