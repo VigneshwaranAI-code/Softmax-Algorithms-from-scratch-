@@ -1,4 +1,4 @@
-<p align="center">
+<!-- <p align="center">
   <img src="image/Screenshot 2025-12-31 004953.png" width="600">
   </p>
 <p align="center">
@@ -139,4 +139,109 @@ print("Safe:", sm.saft_softmax(data))
 
 # 4. Run Online Top-K
 probs, indices = sm.online_with_top_K(data, k=2)
-print(f"Top 2 Probs: {probs}")
+print(f"Top 2 Probs: {probs}") -->
+
+<p align="center">
+  <img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="Project Icon" width="100" height="100">
+  <br>
+  <img src="path/to/your/banner_image.png" alt="Project Banner" width="100%">
+</p>
+
+<h1 align="center">Softmax Algorithms</h1>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Softmax-Algorithms-blue?style=for-the-badge&logo=python" alt="Badge">
+  <br>
+  <a href="https://arxiv.org/pdf/1805.02867">
+    <img src="https://img.shields.io/badge/arXiv-1805.02867-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white" alt="Research Paper">
+  </a>
+</p>
+
+<p align="center">
+  <i>Robust and efficient implementations of Softmax: Naive, Safe, and Online Top-K.</i>
+</p>
+
+---
+
+## 📌 Overview
+
+This repository explores different techniques to compute Softmax probabilities, addressing common issues such as **arithmetic overflow** and **streaming data** processing.
+
+<p align="center">
+  <img src="path/to/algorithm_logic_diagram.png" alt="Softmax Algorithm Logic Diagram" width="600">
+  <br>
+  <em>Figure 1: Visual representation of the Safe Softmax shifting logic.</em>
+</p>
+
+## 💻 Implementation
+
+The core logic is encapsulated in the `softmax` class.
+
+```python
+class softmax:
+    def softmax_navie(self, arr: list[float]) -> list[float]:
+        self.n = len(arr)
+        self.exp_vlaues = 0
+        
+        # Naive implementation (Caution: Prone to overflow)
+        for i in range(self.n):
+            exp = 2.718 ** arr[i]
+            self.exp_vlaues += exp
+            
+        return [(2.718 ** arr[j] / self.exp_vlaues) for j in range(self.n)]
+    
+    def saft_softmax(self, arr: list[float]) -> list[float]:
+        self.n = len(arr)
+        self.max = max(arr)
+        self.denameter = 0
+        
+        # Numerically Stable (Safe) implementation
+        for i in range(self.n):
+            self.denameter += 2.718 ** (arr[i] - self.max)   
+        return [(2.718 ** (arr[j] - self.max) / self.denameter) for j in range(self.n)]
+    
+    def safe_softmax_with_norm(self, arr: list[float]) -> list[float]:
+        self.n = len(arr)
+        self.denameter = 0
+        
+        m = float("-inf")
+        d = 0
+        for i in range(self.n):
+            m_prov = m 
+            m = max(m_prov, arr[i])
+            correction = 2.718 ** (m_prov - m)
+            new_term = 2.718 ** (arr[i] - m)
+            d = (d * correction) + new_term 
+        return [(2.718**(arr[j] - m) / d) for j in range(self.n)]
+    
+    def online_with_top_K(self, arr: list[float], k: int):
+        # Online streaming implementation (single pass)
+        self.n = len(arr)
+        m = float("-inf")
+        d = 0.0 
+        u = [float("-inf")] * (k + 1)
+        p = [-1] * (k + 1)
+        
+        for i in range(self.n):
+            x_val = arr[i]
+            m_prev = m
+            m = max(m_prev, x_val)
+            correction = 2.718**(m_prev - m)
+            d = (d * correction) + (x_val - m)
+            
+            u[k] = x_val   
+            p[k] = i       
+            
+            ptr = k 
+            while ptr >= 1 and u[ptr] > u[ptr-1]:
+                u[ptr], u[ptr-1] = u[ptr-1], u[ptr]
+                p[ptr], p[ptr-1] = p[ptr-1], p[ptr]
+                ptr -= 1
+                
+        top_probs = []
+        top_indices = []
+        for i in range(k):
+            val = 2.718**(u[i] - m) / d
+            top_probs.append(val)
+            top_indices.append(p[i])
+        return top_probs, top_indices
