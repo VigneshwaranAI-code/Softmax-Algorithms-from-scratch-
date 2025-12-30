@@ -12,8 +12,7 @@ The project implements a `softmax` class with methods to handle:
 
 > **⚠️ Important Note on Precision:**
 > The code in this repository is experimental and currently uses an approximate value for Euler's number (`e = 2.718`) for demonstration purposes.
->
-> For production environments or scientific calculations, it is **strongly recommended** to use `numpy.exp()` or `math.exp()` to ensure higher precision and performance.
+> For production environments, it is **strongly recommended** to use `numpy.exp()` or `math.exp()`.
 
 ## 💻 Implementation
 
@@ -25,7 +24,7 @@ class softmax:
         self.n = len(arr)
         self.exp_vlaues = 0
         
-        # Note: Uses approx e=2.718. Use numpy.exp() for production.
+        # Naive implementation
         for i in range(self.n):
             exp = 2.718 ** arr[i]
             self.exp_vlaues += exp
@@ -56,42 +55,7 @@ class softmax:
             d = (d * correction) + new_term 
         return [(2.718**(arr[j] - m) / d) for j in range(self.n)]
     
-    
     def online_with_top_K(self, arr: list[float], k: int):
-        self.n = len(arr)
-        m = float("-inf")
-        d = 0.0 
-        
-        # Buffers to hold the top k + 1 candidates
-        u = [float("-inf")] * (k + 1)
-        p = [-1] * (k + 1)
-        
-        for i in range(self.n):
-            x_val = arr[i]
-            
-            # --- 1. Softmax Statistics ---
-            m_prev = m
-            m = max(m_prev, x_val)
-            correction = 2.718**(m_prev - m)
-            d = (d * correction) + (x_val - m)
-            
-            # --- 2. Top-K Maintenance ---
-            u[k] = x_val   
-            p[k] = i       
-            
-            # Bubble up logic
-            ptr = k 
-            while ptr >= 1 and u[ptr] > u[ptr-1]:
-                u[ptr], u[ptr-1] = u[ptr-1], u[ptr]
-                p[ptr], p[ptr-1] = p[ptr-1], p[ptr]
-                ptr -= 1
-                
-        top_probs = []
-        top_indices = []
-        
-        for i in range(k):
-            val = 2.718**(u[i] - m) / d
-            top_probs.append(val)
-            top_indices.append(p[i])
-
-        return top_probs, top_indices
+        # ... (Implementation for streaming data)
+        # See full code in Softmax_Algorithms.ipynb
+        pass
