@@ -1,6 +1,20 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Softmax-Algorithms-blue?style=for-the-badge&logo=python" alt="Project Logo">
+</p>
+
 # Softmax Algorithms
 
 This repository contains Python implementations of various Softmax algorithms, ranging from the naive approach to numerically stable and online versions.
+
+<p align="center">
+  <a href="https://arxiv.org/pdf/1805.02867">
+    <img src="https://img.shields.io/badge/arXiv-1805.02867-B31B1B?style=for-the-badge&logo=arxiv&logoColor=white" alt="Research Paper">
+  </a>
+  <br>
+  <i>Based on "Online Normalizer Calculation for Softmax"</i>
+</p>
+
+---
 
 ## 📌 Overview
 
@@ -56,6 +70,33 @@ class softmax:
         return [(2.718**(arr[j] - m) / d) for j in range(self.n)]
     
     def online_with_top_K(self, arr: list[float], k: int):
-        # ... (Implementation for streaming data)
-        # See full code in Softmax_Algorithms.ipynb
-        pass
+        # Implementation based on the referenced arXiv paper
+        self.n = len(arr)
+        m = float("-inf")
+        d = 0.0 
+        u = [float("-inf")] * (k + 1)
+        p = [-1] * (k + 1)
+        
+        for i in range(self.n):
+            x_val = arr[i]
+            m_prev = m
+            m = max(m_prev, x_val)
+            correction = 2.718**(m_prev - m)
+            d = (d * correction) + (x_val - m)
+            
+            u[k] = x_val   
+            p[k] = i       
+            
+            ptr = k 
+            while ptr >= 1 and u[ptr] > u[ptr-1]:
+                u[ptr], u[ptr-1] = u[ptr-1], u[ptr]
+                p[ptr], p[ptr-1] = p[ptr-1], p[ptr]
+                ptr -= 1
+                
+        top_probs = []
+        top_indices = []
+        for i in range(k):
+            val = 2.718**(u[i] - m) / d
+            top_probs.append(val)
+            top_indices.append(p[i])
+        return top_probs, top_indices
